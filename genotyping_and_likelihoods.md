@@ -62,3 +62,10 @@ And then also add the --sites $sites option to our ANGSD call for these samples.
 while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=lcwgs_angsdparam.tsv  10_refsites_angsd_bcf_beag_maf.sh ;  
   done < Ssal_v3.1_genomic.chroms 
 ```
+
+Now we have a bunch of kinda useless bcf files. They're smaller than vcfs but they lack human interpretable info, so we need to convert them to vcfs. We do this per bcf file, so we again specify the chromosome and file set.
+
+```
+while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=refs_angsdparam.tsv  11_bcf_to_vcf.sh ;  
+  done < Ssal_v3.1_genomic.chroms
+
