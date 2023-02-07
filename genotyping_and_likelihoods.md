@@ -69,3 +69,5 @@ Now we have a bunch of kinda useless bcf files. They're smaller than vcfs but th
 while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=refs_angsdparam.tsv  11_bcf_to_vcf.sh ;  
   done < Ssal_v3.1_genomic.chroms
 
+while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=lcwgs_angsdparam.tsv  11_bcf_to_vcf.sh ;  
+  done < Ssal_v3.1_genomic.chroms 
