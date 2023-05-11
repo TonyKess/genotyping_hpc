@@ -13,6 +13,7 @@ mkdir sets
 mkdir trim
 mkdir align
 mkdir angsd_out
+mkdir angsd_in
 mkdir gatk_out
 mkdir phased
 mkdir GWAS
