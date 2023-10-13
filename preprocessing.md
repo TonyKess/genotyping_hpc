@@ -58,12 +58,12 @@ Go to the raw reads and use split to make set files for parallel SLURM jobs. For
 cd reads
   
 ls *R1.fastq.gz | \
-  sed 's/\_R1.fastq.gz//' > ../sets/aeipinds.tsv 
+  sed 's/\_R1.fastq.gz//' > ../sets/$projname\_inds.tsv 
   
  split -l 100 \
   -d \
- ../sets/aeipinds.tsv \
- ../sets/aeipset
+ ../sets/$projname\_inds.tsv \
+ ../sets/$projname.set
 
 ```
 
@@ -83,12 +83,11 @@ ls *R1.fastq.gz | \
 ```
   
   
-Make/edit a file with parameters for analysis (WGSparams_aeip.tsv and here), and use it for launching analyses via SLURM scheduling.  
-  
+We also use the file with parameters for analysis, and use it for launching analyses via SLURM scheduling.    
 Launch the first script in the analysis pipeline, using default trimming parameters in [fastp](https://github.com/OpenGene/fastp) to remove adapter content, and add a sliding window function to remove polyG tails, as suggested by [Lou et al. 2022](https://doi.org/10.1111/1755-0998.13559). This script will be launched to run in parallel on all individuals, 100 at a time for low depth samples, 15 at a time for our high depth phasing panel.
 
 ```
-for i in {00..07} ;    do sbatch --export=ALL,set=aeipset$i,paramfile=WGSparams_aeip.tsv 01_fastp_parallel.sh ;  done
+for i in sets/$projname.set* ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 01_fastp_parallel.sh ;  done
 ```
 And 15 individuals at a time for high depth samples:
 
