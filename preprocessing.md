@@ -67,20 +67,7 @@ ls *R1.fastq.gz | \
 
 ```
 
-For large per-individual datasets (high genomic coverage, large genome, both), we need to make smaller sets:
-   
-``` 
-cd reads
-  
-ls *R1.fastq.gz | \
-  sed 's/\_R1.fastq.gz//' > ../sets/aeipphaseinds.tsv 
-  
- split -l 15 \
-  -d \
- ../sets/aeipphaseinds.tsv \
- ../sets/aeipphaseset
-
-```
+For large per-individual datasets (high genomic coverage, large genome, both), we need to make smaller sets, e.g. split by ~10 rather than 100. 
   
   
 We also use the file with parameters for analysis, and use it for launching analyses via SLURM scheduling.    
