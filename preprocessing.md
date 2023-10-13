@@ -19,6 +19,33 @@ mkdir phased
 mkdir GWAS
 mkdir PCANGSD_out 
 ```
+Next we put together a parameter file, that has information on project names, software locations, and other pieces of info to pass to scripts. It looks like this:
+
+```
+#locations
+#main directory for project
+projdir=<project location>
+#sample info
+projname=<project name>
+
+#genome file location
+genome=<path to target species genome>
+#species
+species=$(<species name>)
+
+#software
+#gatk37 - old version that still allows indel realignment, requires openjdk 8, built in gatk37 conda env
+#to run this one make sure you source your conda environment
+#and then run conda activate gatk37 to get openjdk8 
+gatk37=<some path>/software/GenomeAnalysisTK.jar
+
+```
+Then we can source this paramater file to pass these to the bash environment:
+```
+source WGS_params.tsv
+```
+
+
 We assume our reads are already hanging out in the aptly named
   
 ```
