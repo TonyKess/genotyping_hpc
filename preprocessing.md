@@ -59,24 +59,23 @@ Go to the raw reads and use split to make set files for parallel SLURM jobs. For
 cd reads
   
 ls *R1.fastq.gz | \
-  sed 's/\_R1.fastq.gz//' > ../sets/$projname\_inds.tsv 
+  sed 's/\_R1.fastq.gz//' > ../sets/<project name>_inds.tsv 
   
  split -l 100 \
   -d \
- ../sets/$projname\_inds.tsv \
- ../sets/$projname.set
+ ../sets/<project name>\_inds.tsv \
+ ../sets/<project name>.set
 
 ```
 
-For large per-individual datasets (high genomic coverage, large genome, both), we need to make smaller sets, e.g. split by ~10 rather than 100. 
+For large per-individual datasets (high genomic coverage, large genome, both), we need to make smaller sets, e.g. split by ~10-15 rather than 100. 
   
-
 ## Read trimming
    
 Launch the first script in the analysis pipeline, using default trimming parameters in [fastp](https://github.com/OpenGene/fastp) to remove adapter content, and add a sliding window function to remove polyG tails, as suggested by [Lou et al. 2022](https://doi.org/10.1111/1755-0998.13559). This script will be launched to run in parallel on all individuals, 100 at a time for low depth samples, 15 at a time for our high depth phasing panel.
 
 ```
-for i in {00..<n set files>}  ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 01_fastp_parallel.sh ;  done
+for i in {00..<n set files>}  ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_<project name>.tsv 01_fastp_parallel.sh ;  done
 ```
 And 15 individuals at a time for high depth samples:
 
@@ -92,12 +91,12 @@ Different tasks will have different "optimal settings" (i.e. good enough) for pa
 Next, we need to index the genome for alignment and alignment cleanup. We only need to do this once per genome, like so:
 
 ```
-sbatch --export=ALL,paramfile=WGSparams_$projname.tsv 02_genome_index_faidx.sh
+sbatch --export=ALL,paramfile=WGSparams_<project name>.tsv 02_genome_index_faidx.sh
 ```
 Now we can get to aligning our reads against the reference genome. This process gains from additional threads (and does weird stuff when you run it with GNU parallel on large read files...) so we take up a whole node per run, with 64 cpus. 
  
 ```
-for i in {00..<n set files>} ;    do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 03_bwamem2align.sh ;  done
+for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name>.tsv 03_bwamem2align.sh ;  done
   
 ```
 ## Refining alignments
@@ -123,30 +122,28 @@ parallel --jobs 15
 Then, just like other tasks, we can launch the jobs for all samples simulatenously.
 
 ```
-for i in {00..<n set files>} ;    do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 04_gatkmarkdup.sh ;  done
+for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name>.tsv 04_gatkmarkdup.sh ;  done
 
 
 At the same time, we are going to start needing a sequence dictionary for indel realignemt. So we can also do that now, just once per reference genome.
  
 ```
-sbatch --export=ALL,paramfile=WGSparas_aeip.tsv 05_genome_sequencedicitonary.sh
+sbatch --export=ALL,paramfile=WGSparams_<project name> 05_genome_sequencedicitonary.sh
 ```
 
 For realignment around insertsions/deletions, we will first need to index the deduplicated alignment files we are working from. Again, we will adjust the number of CPUs to the batch size and run with 1 cpu/sample. 
 
 ```
-for i in {00..<n set files>} ;    do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 06_samtools_indexdedup_parallel.sh ;  done
+for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name>.tsv 06_samtools_indexdedup_parallel.sh ;  done
 
 Now we can get to actually realigning! Worth nothing this step is from a deprecated version of GATK, but because we are going to do our SNP calling and analysis of genotype likelihoods in ANGSD, we still need to realign. This can be done in a couple of steps, first identifying realignment targets:
 
 ```
-for i in {00..07} ;    do sbatch --export=ALL,set=aeipset$i,paramfile=WGSparams_aeip.tsv 07_indel_target_parallel.sh ;  done
-for i in {00..07} ;    do sbatch --export=ALL,set=aeipphaseset$i,paramfile=WGSparams_aeipphase.tsv 07_indel_target_parallel.sh ;  done
-```
+for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile==WGSparams_<project name> 07_indel_target_parallel.sh ;  done
+
 And then updating those alignments:  
 ```
-for i in {00..07} ;    do sbatch --export=ALL,set=aeipset$i,paramfile=WGSparams_aeip.tsv  08_indel_realign_parallel.sh ;  done
-for i in {00..07} ;    do sbatch --export=ALL,set=aeipphaseset$i,paramfile=WGSparams_aeipphase.tsv  08_indel_realign_parallel.sh ;  done
-```  
+for i in for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name> 08_indel_realign_parallel.sh ;  done
+
 
 This should cover all of the pre-processing steps, and we are ready to move on to the [confusing realm](https://github.com/ANGSD/angsd/issues) of ectracting genotype likelihoods from ANGSD.
