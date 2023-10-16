@@ -18,10 +18,7 @@ mkdir trim
 mkdir align
 mkdir angsd_out
 mkdir angsd_in
-mkdir gatk_out
-mkdir phased
-mkdir GWAS
-mkdir PCANGSD_out 
+
 ```
 ## Passing project information to tools
 
