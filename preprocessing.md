@@ -1,4 +1,5 @@
-# Intro
+# Preprocessing of genomic data
+## Background
 Raw sequence data requires pre-processing to be used in genotyping pipelines. You would think someone would have dealt with this issue in a single consolidated software package, and that is [kind of true](https://nf-co.re/sarek). But projects in "non-model" species (e.g. everything) often have lots of small analysis decisions that require working closely with the data, so we are going to run these steps ourselves! Working with pre-configured pipelines also often requires prior knowledge of what the tools are actually doing, and what their inputs/outputs and errors look like. The scripts for running these on a SLURM cluster are listed [here](https://github.com/TonyKess/genotyping_hpc/tree/main/scripts). 
 
 Eventually we can combine these into a single workflow for reproducibility and solve the problem of genotyping permanently and everyone can move on to working on other problems rather than building wrappers around their own preferred toolset for genotyping data used in their research. [ha](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7111497/) [ha](https://academic.oup.com/bioinformatics/article/34/1/107/4096362) [just](https://github.com/snakemake-workflows/dna-seq-gatk-variant-calling) [kidding](https://www.nature.com/articles/nmeth.3505). 
@@ -6,6 +7,8 @@ Eventually we can combine these into a single workflow for reproducibility and s
 It's still worth packaging tools as a workflow where possible, and these are great resources that have been developed, but often each project has different suites of tools that need to be tested and run.
 
 This section provides links for running tools we have used for genotyping fisheries species, with an emphasis on handling low and medium coverage data through working with genotype likelihoods and imputation. We run these tools in [SLURM](https://slurm.schedmd.com/documentation.html) and a bit of background on why we run them in a specific order.
+
+## Directory setup
 
 First, we need to set up the directory structure:
   
@@ -20,6 +23,8 @@ mkdir phased
 mkdir GWAS
 mkdir PCANGSD_out 
 ```
+## Passing project information to tools
+
 Next we put together a parameter file, that has information on project names, software locations, and other pieces of info to pass to scripts. It looks like this:
 
 ```
@@ -65,17 +70,18 @@ ls *R1.fastq.gz | \
 
 For large per-individual datasets (high genomic coverage, large genome, both), we need to make smaller sets, e.g. split by ~10 rather than 100. 
   
-  
-We also use the file with parameters for analysis, and use it for launching analyses via SLURM scheduling.    
+
+## Read trimming
+   
 Launch the first script in the analysis pipeline, using default trimming parameters in [fastp](https://github.com/OpenGene/fastp) to remove adapter content, and add a sliding window function to remove polyG tails, as suggested by [Lou et al. 2022](https://doi.org/10.1111/1755-0998.13559). This script will be launched to run in parallel on all individuals, 100 at a time for low depth samples, 15 at a time for our high depth phasing panel.
 
 ```
-for i in sets/$projname.set* ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 01_fastp_parallel.sh ;  done
+for i in {00..<n set files>}  ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_$projname.tsv 01_fastp_parallel.sh ;  done
 ```
 And 15 individuals at a time for high depth samples:
 
 ```
- for i in {00..07} ;    do sbatch --export=ALL,set=aeipphaseset$i,paramfile=WGSparams_aeipphase.tsv 01_fastp_parallel.sh ;  done
+for i in {00..<n set files>}   ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name> .tsv 01_fastp_parallel.sh ;  done
 ```
 There is a tradeoff for adapter trimming and parallelizing with fastp - it does not become much more efficient at anything beyond [4 threads](https://hpc.nih.gov/training/gatk_tutorial/preproc.html#preproc-single-tools). So we run our each on a single node and allocate 4 threads per task, with 16 separate jobs running. Our script will look like this:
   
