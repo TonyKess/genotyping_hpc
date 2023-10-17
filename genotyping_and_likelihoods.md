@@ -1,7 +1,7 @@
 Now it is time to genotype! 
 We use ANGSD for both genotpying and genotype likelihood estimation. Lots of work relies on genotype likelihoods exclusively for analyses - a great tutorial on that approach is [here](https://github.com/nt246/lcwgs-guide-tutorial/tree/main). 
 
-We generate both raw genotypes and likelihoods simultaneously, the reasoning being that we've found very high similarity in imputed genotype and likelihood estimate allele frequencies, and working with called genotypes is often just logistically easier. Here is an example from Atlantic Salmon:
+We generate both raw genotypes and likelihoods simultaneously, the reasoning being that we've found very high similarity in imputed genotype and likelihood estimate allele frequencies, and working with called genotypes is often just logistically easier because they work in catch-all analysis programs like [plink](https://zzz.bwh.harvard.edu/plink/plink2.shtml) and [vcftools (which is now deprecated but still great](https://vcftools.github.io/index.html). Here is an example from Atlantic Salmon:
 <img width="669" alt="image" src="https://github.com/TonyKess/genotyping_hpc/assets/33424749/1bbe3348-cbf8-46e9-a2a7-3e0778d87d04">
 
 We will calculate [genotype likelihoods](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3593722/), which are uncertainty-weighted estimates of an individual's genotype at a locus. We will carry this out across each chromosome separately, because it is somewhat memory and time intensive. Notice that we are now exporting a couple of different variables to slurm - we are specifying chromosome rather than set, and some run-specific parameters that we keep in another params file. Additionally, we will also output 
