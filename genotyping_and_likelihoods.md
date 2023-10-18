@@ -1,6 +1,6 @@
 # Genotype calling and likelihood estimation
 
-#
+## Background
 Now it is time to genotype! 
 We use ANGSD for both genotpying and genotype likelihood estimation. Lots of work relies on genotype likelihoods exclusively for analyses - a great tutorial on that approach is [here](https://github.com/nt246/lcwgs-guide-tutorial/tree/main). 
 
@@ -9,6 +9,7 @@ We generate both raw genotypes and likelihoods simultaneously, the reasoning bei
 
 We will calculate [genotype likelihoods](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3593722/), which are uncertainty-weighted estimates of an individual's genotype at a locus. We will carry this out across each chromosome separately, because it is somewhat memory and time intensive. Notice that we are now exporting a couple of different variables to slurm - we are specifying chromosome rather than set, and some run-specific parameters that we keep in another params file. This parameters to pass to ANGSD look like this:
 
+## Parameters
 ```
 bamfile=<bamlist>.tsv
 runname=<your project name>
@@ -23,6 +24,7 @@ cut -f1 <your reference genome.fasta.fai> > chroms
 
 ```
 
+## Job submission
 
 while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=refs_angsdparam.tsv  09_angsd_bcf_beag_maf.sh ;  
   done < Ssal_v3.1_genomic.chroms
@@ -33,13 +35,13 @@ We are doing this first for a set of individuals sequenced at high coverage. The
 cd projdir/angsd_in
 
 $angsd \
-  -nThreads 8 \
-  -bam $bamfile \
-  -out $projdir/angsd_out/$species.$projname.$runname.$chrom. \
-  -dobcf 1 \
-  -gl 1 \
-  -dopost 1 \
-  -dogeno 5 \
+  -nThreads 8 \ #multithread - later versions auto-cap this at 8 
+  -bam $bamfile \ # list of individuals
+  -out $projdir/angsd_out/$species.$projname.$runname.$chrom. \ 
+  -dobcf 1 \ #make bcf file
+  -gl 1 \ #samtools variant call
+  -dopost 1 \ #estimate the posterior genotype probability based on the allele frequency as a prior
+  -dogeno 5 \ #print out genotypes as major and minor, and 
   -doGlf 2 \
   -domajorminor 1 \
   -domaf 1 \
