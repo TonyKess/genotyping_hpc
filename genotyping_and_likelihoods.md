@@ -26,6 +26,7 @@ cut -f1 <your reference genome.fasta.fai> > chroms
 
 ## Job submission
 
+```
 while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=refs_angsdparam.tsv  09_angsd_bcf_beag_maf.sh ;  
   done < Ssal_v3.1_genomic.chroms
 ```
