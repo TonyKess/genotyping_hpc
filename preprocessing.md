@@ -107,13 +107,13 @@ I make separate ones for each project but you can also just point to a single lo
 The other thing worth doing is optimizing the number of threads utilized per run based on file size. The GATK tools don't usually make use of multithreading, so it's often more efficient to just allocate a single cpu/task and then run those tasks [simultaneously.](https://en.wikipedia.org/wiki/Embarrassingly_parallel) For the high depth samples this means fewer total CPUs/run of the script.We adjust these parameters in the sbatch commands:
 
 ```
-#SBATCH --cpus-per-task=15  
+#SBATCH --cpus-per-task=64
 ```
 
 and passed to GNU parallel:
 
 ```
-parallel --jobs 15
+parallel --jobs 64
 ```
   
 Then, just like other tasks, we can launch the jobs for all samples simulatenously.
