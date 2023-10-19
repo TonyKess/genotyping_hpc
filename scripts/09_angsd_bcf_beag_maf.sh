@@ -13,11 +13,10 @@
 source $paramfile
 source $angsdparam
 
-#source conda
-source ~/miniconda3/etc/profile.d/conda.sh
+#source mamba
+source ~/.bashrc
 
-#activate the alignment environment
-conda activate align
+mamba activate align
 cd $projdir/angsd_in
 
 angsd \
