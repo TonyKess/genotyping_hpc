@@ -20,6 +20,8 @@ mkdir angsd_out
 mkdir angsd_in
 
 ```
+All scripts launch from the project directory, which is one level above these other directories.
+
 ## Passing project information to tools
 
 Next we put together a parameter file, that has information on project names, software locations, and other pieces of info to pass to scripts. It looks like this:
@@ -37,6 +39,9 @@ genome=<path to target species genome>
 species=$(<species name>)
 
 #software
+#gatk - for deduplication mostly
+gatk=<somepath>/software/<gatk4.something.jar>
+
 #gatk37 - old version that still allows indel realignment, requires openjdk 8, built in gatk37 conda env
 #to run this one make sure you source your conda environment
 #and then run conda activate gatk37 to get openjdk8 
@@ -44,7 +49,7 @@ gatk37=<some path>/software/GenomeAnalysisTK.jar
 
 ```
 
-We assume our reads are already hanging out in the aptly named
+We assume our reads are already hanging out in the aptly named. For this tutorial, we are working with reads in [fastq format](https://knowledge.illumina.com/software/general/software-general-reference_material-list/000002211)
   
 ```
 reads/
@@ -69,15 +74,10 @@ For large per-individual datasets (high genomic coverage, large genome, both), w
   
 ## Read trimming
    
-Launch the first script in the analysis pipeline, using default trimming parameters in [fastp](https://github.com/OpenGene/fastp) to remove adapter content, and add a sliding window function to remove polyG tails, as suggested by [Lou et al. 2022](https://doi.org/10.1111/1755-0998.13559). This script will be launched to run in parallel on all individuals, 100 at a time for low depth samples, 15 at a time for our high depth phasing panel.
+Launch the first script in the analysis pipeline, using default trimming parameters in [fastp](https://github.com/OpenGene/fastp) to remove adapter content, and add a sliding window function to remove polyG tails, as suggested by [Lou et al. 2022](https://doi.org/10.1111/1755-0998.13559). This script will be launched to run in parallel on all individuals, 100 at a time for low depth samples.
 
 ```
 for i in {00..<n set files>}  ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_<project name>.tsv 01_fastp_parallel.sh ;  done
-```
-And 15 individuals at a time for high depth samples:
-
-```
-for i in {00..<n set files>}   ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name> .tsv 01_fastp_parallel.sh ;  done
 ```
 There is a tradeoff for adapter trimming and parallelizing with fastp - it does not become much more efficient at anything beyond [4 threads](https://hpc.nih.gov/training/gatk_tutorial/preproc.html#preproc-single-tools). So we run our each on a single node and allocate 4 threads per task, with 16 separate jobs running. 
 
@@ -96,6 +96,8 @@ Now we can get to aligning our reads against the reference genome. This process 
 for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name>.tsv 03_bwamem2align.sh ;  done
   
 ```
+
+This process generates [.bam](https://support.illumina.com/help/BS_App_RNASeq_Alignment_OLH_1000000006112/Content/Source/Informatics/BAM-Format.htm) files that are sorted by position. These represent a compressed and space-efficient recording of alingments to a reference genome for each read.
 ## Refining alignments
 
 Next, we remove sequence duplicates using the genome analysis toolkit. Two things to make sure of in advance. First, we need to make a directory for the temporary files produced by gatk:
@@ -122,7 +124,7 @@ Then, just like other tasks, we can launch the jobs for all samples simulatenous
 for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name>.tsv 04_gatkmarkdup.sh ;  done
 
 
-At the same time, we are going to start needing a sequence dictionary for indel realignemt. So we can also do that now, just once per reference genome.
+At the same time, we are going to need a sequence dictionary for indel realignemt. So we can also produce that now, just once per reference genome.
  
 ```
 sbatch --export=ALL,paramfile=WGSparams_<project name> 05_genome_sequencedicitonary.sh
