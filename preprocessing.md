@@ -1,6 +1,6 @@
 # Preprocessing of genomic data
 ## Background
-Raw sequence data requires pre-processing to be used in genotyping pipelines. 
+Raw sequence data requires pre-processing to be used in genotyping pipelines. Here is an overview of an older version of the GATK "best practices", which we will be using parts of. 
 ![image](https://github.com/TonyKess/genotyping_hpc/assets/33424749/45bbf013-1eaa-4bea-8d8e-1681c8f4db4a)
 
 You would think someone would have dealt with this issue in a single consolidated software package, and that is [kind of true](https://nf-co.re/sarek). But projects in "non-model" species (e.g. everything) often have lots of small analysis decisions that require working closely with the data, so we are going to run these steps ourselves! Working with pre-configured pipelines also often requires prior knowledge of what the tools are actually doing, and what their inputs/outputs and errors look like. The scripts for running these on a SLURM cluster are listed [here](https://github.com/TonyKess/genotyping_hpc/tree/main/scripts). 
