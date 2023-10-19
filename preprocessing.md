@@ -1,6 +1,9 @@
 # Preprocessing of genomic data
 ## Background
-Raw sequence data requires pre-processing to be used in genotyping pipelines. You would think someone would have dealt with this issue in a single consolidated software package, and that is [kind of true](https://nf-co.re/sarek). But projects in "non-model" species (e.g. everything) often have lots of small analysis decisions that require working closely with the data, so we are going to run these steps ourselves! Working with pre-configured pipelines also often requires prior knowledge of what the tools are actually doing, and what their inputs/outputs and errors look like. The scripts for running these on a SLURM cluster are listed [here](https://github.com/TonyKess/genotyping_hpc/tree/main/scripts). 
+Raw sequence data requires pre-processing to be used in genotyping pipelines. 
+![image](https://github.com/TonyKess/genotyping_hpc/assets/33424749/45bbf013-1eaa-4bea-8d8e-1681c8f4db4a)
+
+You would think someone would have dealt with this issue in a single consolidated software package, and that is [kind of true](https://nf-co.re/sarek). But projects in "non-model" species (e.g. everything) often have lots of small analysis decisions that require working closely with the data, so we are going to run these steps ourselves! Working with pre-configured pipelines also often requires prior knowledge of what the tools are actually doing, and what their inputs/outputs and errors look like. The scripts for running these on a SLURM cluster are listed [here](https://github.com/TonyKess/genotyping_hpc/tree/main/scripts). 
 
 Eventually we can combine these into a single workflow for reproducibility and solve the problem of genotyping permanently and everyone can move on to working on other problems rather than building wrappers around their own preferred toolset for genotyping data used in their research. [ha](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7111497/) [ha](https://academic.oup.com/bioinformatics/article/34/1/107/4096362) [just](https://github.com/snakemake-workflows/dna-seq-gatk-variant-calling) [kidding](https://www.nature.com/articles/nmeth.3505). 
 
