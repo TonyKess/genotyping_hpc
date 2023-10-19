@@ -1,5 +1,5 @@
-##Genotyping on the gpsc
-
+##Genotyping in an HPC environment
+# Preamble
 This repo is for testing out some genotyping tools on the gpsc. 
 
 Also some misc. links that cover tools used that I have found helpful:
