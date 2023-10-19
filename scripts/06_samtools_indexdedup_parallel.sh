@@ -12,10 +12,10 @@
 #load variables
 source $paramfile
 
-#source conda
-source ~/miniconda3/etc/profile.d/conda.sh
+#source mamba
+source ~/.bashrc
 
-conda activate align
+mamba activate align
 
 #activate parallel
 . ssmuse-sh -x main/opt/parallel/parallel-20210922
