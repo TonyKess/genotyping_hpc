@@ -77,7 +77,7 @@ For large per-individual datasets (high genomic coverage, large genome, both), w
 Launch the first script in the analysis pipeline, using default trimming parameters in [fastp](https://github.com/OpenGene/fastp) to remove adapter content, and add a sliding window function to remove polyG tails, as suggested by [Lou et al. 2022](https://doi.org/10.1111/1755-0998.13559). This script will be launched to run in parallel on all individuals, 100 at a time for low depth samples.
 
 ```
-for i in {00..<n set files>}  ;  do sbatch --export=ALL,set=$i,paramfile=WGSparams_<project name>.tsv 01_fastp_parallel.sh ;  done
+for i in {00..<n set files>}  ;  do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name>.tsv 01_fastp_parallel.sh ;  done
 ```
 There is a tradeoff for adapter trimming and parallelizing with fastp - it does not become much more efficient at anything beyond [4 threads](https://hpc.nih.gov/training/gatk_tutorial/preproc.html#preproc-single-tools). So we run our each on a single node and allocate 4 threads per task, with 16 separate jobs running. 
 
