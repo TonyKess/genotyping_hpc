@@ -14,7 +14,7 @@ But building these skills can be rewarding and fun. So, my only advice here is t
 
 Also some misc. links that cover tools used that I have found helpful:
 
-[The most useful (and basically only) training resource I've] used(http://korflab.ucdavis.edu/unix_and_perl/).
+[The most useful (and basically only) training resource I've used](http://korflab.ucdavis.edu/unix_and_perl/).
 
 GATK [parallelism and multithreading](https://sites.google.com/a/broadinstitute.org/legacy-gatk-documentation/dictionary/1988-Parallelism?pli=1)
 
