@@ -42,25 +42,25 @@ $angsd \
   -dobcf 1 \ #make bcf file
   -gl 1 \ #samtools variant call
   -dopost 1 \ #estimate the posterior genotype probability based on the allele frequency as a prior
-  -dogeno 5 \ #print out genotypes as major and minor, and 
-  -doGlf 2 \
-  -domajorminor 1 \
-  -domaf 1 \
-  -docounts 1 \
-  -dumpCounts 2 \
-  -doQsDist 1 \
-  -minMapQ 30 \
-  -minQ 30 \
-  -minInd $minInd \
-  -SNP_pval 2e-6 \
-  -uniqueOnly 1 \
-  -minMaf 0.05 \
-  -setMinDepth $minDepth \
-  -r $chrom \
-  -remove_bads 1 \
-  -only_proper_pairs 1
+  -dogeno 5 \ #print out genotypes as major and minor (1), and print out base calls (4) - flag is additive
+  -doGlf 2 \ #output likelihoods as beagle files
+  -domajorminor 1 \ #Infer major and minor from GL
+  -domaf 1 \ #calculate allele frequency from "known" major and minor inferred from likielihoods
+  -docounts 1 \ #count total depth per locus/per allele
+  -dumpCounts 2 \ #output individual allele depths
+  -doQsDist 1 \ #base quality score count
+  -minMapQ 30 \ #only output sites with mapQ 30 or greater
+  -minQ 30 \ #only output sites with basecall Q 30 or greater
+  -minInd $minInd \ #minimum individual required for allele observation
+  -SNP_pval 2e-6 \ #output sites with probable SNPs 
+  -uniqueOnly 1 \ #drop multi-map locations
+  -minMaf 0.05 \ #maf cutoff 0.05
+  -setMinDepth $minDepth \ #mindepth per locus
+  -r $chrom \ #retain this site
+  -remove_bads 1 \ #remove reads with failed map/pairing paramterts
+  -only_proper_pairs 1 #only keep reads with proper pairing
  ```
-Most of it won't change, but we can use sites genotyped at high coverage for better imputation (potentially? We'll see). To get these sites after the first genotyping run, we do the following:
+Most of it won't change, but we can use sites genotyped at high coverage for imputation or to maintain allele calls across samples. To get these sites after the first genotyping run, we do the following:
 
 ```
 zcat *mafs.gz  | sort | uniq | cut -f1,2,3,4 | sed '$d' > All_sites.tsv
@@ -76,10 +76,6 @@ conda deactivate
 We can add this information to the parameter file for our lcWGS samples:
 
 ```
-bamfile=lcbams.tsv
-runname=lcwgs
-minInd=600
-minDepth=1000
 sites=All_sites.tsv
 ```
 And then also add the --sites $sites option to our ANGSD call for these samples. Because we are specifying another option for ANGSD, we run a new script that now includes the site option:
@@ -94,6 +90,6 @@ Now we have a bunch of kinda useless bcf files. They're smaller than vcfs but th
 ```
 while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_<project name>,angsdparam=<project_name>_angsdparam.tsv  11_bcf_to_vcf.sh ;  
   done < chroms
+```
 
-while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_aeip.tsv,angsdparam=lcwgs_angsdparam.tsv  11_bcf_to_vcf.sh ;  
-  done < chroms 
+And we're done! ANGSD has handled much of the conversion here
