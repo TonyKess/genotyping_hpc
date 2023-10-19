@@ -12,9 +12,8 @@
 source $paramfile
 
 #source conda
-source ~/miniconda3/etc/profile.d/conda.sh
-
-conda activate align
+source ~/.bashrc
+mamba activate align
 
 #index a couple of different ways
 bwa-mem2 index $genome
