@@ -9,8 +9,8 @@
 ##SBATCH stuff
 ##SBATCH stuff
 
-#source conda
-source ~/miniconda3/etc/profile.d/conda.sh
+#source mamba
+source ~/.bashrc
 
 #load variables
 source $paramfile
@@ -18,7 +18,7 @@ source $paramfile
 #load GNU parallel in special gpsc way
 . ssmuse-sh -x main/opt/parallel/parallel-20210922
 
-conda activate fastp
+mamba activate fastp
 
 #export to make parallel happy
 export fastp
