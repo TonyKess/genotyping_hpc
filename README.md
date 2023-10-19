@@ -1,4 +1,4 @@
-##Genotyping in an HPC environment
+## Genotyping in an HPC environment
 # Preamble
 This repo is for testing out some genotyping tools on the gpsc. 
 
