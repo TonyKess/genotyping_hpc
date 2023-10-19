@@ -62,8 +62,9 @@ unzip gatk-4.3.0.0.zip
 tar -xvf
 ```
 
-Additionally, we need a reference genome for our study species. We will work with the Atlantic Salmon genome:
+Additionally, we need a reference genome for our study species. Here is an example pull of the  with the Atlantic Salmon genome:
 
 ```
 curl -OJX GET "https://api.ncbi.nlm.nih.gov/datasets/v1/genome/accession/GCF_905237065.1/download?include_annotation_type=GENOME_GFF,RNA_FASTA,CDS_FASTA,PROT_FASTA&filename=GCF_905237065.1.zip" -H "Accept: application/zip"
 ```
+Genomes and the associated download commands can be found in NCBI datasets [here](https://www.ncbi.nlm.nih.gov/datasets/genome/)
