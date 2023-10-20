@@ -142,10 +142,10 @@ Now we can get to actually realigning! Worth nothing this step is from a depreca
 
 ```
 for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile==WGSparams_<project name> 07_indel_target_parallel.sh ;  done
-
+```
 And then updating those alignments:  
 ```
 for i in for i in {00..<n set files>} ;    do sbatch --export=ALL,set=<project name>.set$i,paramfile=WGSparams_<project name> 08_indel_realign_parallel.sh ;  done
-
+```
 
 This should cover all of the pre-processing steps, and we are ready to move on to the [confusing realm](https://github.com/ANGSD/angsd/issues) of ectracting genotype likelihoods from ANGSD.
