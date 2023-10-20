@@ -92,4 +92,4 @@ while read chrom;  do sbatch --export=ALL,chrom=$chrom,paramfile=WGSparams_<proj
   done < chroms
 ```
 
-And we're done! ANGSD has handled much of the conversion here
+And we're done! ANGSD has handled much of the filtering and format conversion here for us, so we can now do different population genomic analyses. 
